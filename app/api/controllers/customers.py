@@ -8,23 +8,23 @@ from app.api.utils.customer_utils import (
 )
 
 
-async def create_customer(customer_data: dict):
+async def create_customer(db, customer_data: dict):
     """
     Create a new customer
     """
     try:
-        new_customer = await create_customer_in_db(customer_data)
+        new_customer = await create_customer_in_db(db, customer_data)
         return new_customer
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-async def read_customer(customer_id: str):
+async def read_customer(db, customer_id):
     """
     Get a customer by ID
     """
     try:
-        customer = await get_customer_from_db(customer_id)
+        customer = await get_customer_from_db(db, customer_id)
         if customer:
             return customer
         else:
@@ -33,12 +33,12 @@ async def read_customer(customer_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def update_customer(customer_id: str, customer_data: dict):
+async def update_customer(db, customer_id, customer_data: dict):
     """
     Update a customer by ID
     """
     try:
-        updated_customer = await update_customer_in_db(customer_id, customer_data)
+        updated_customer = await update_customer_in_db(db, customer_id, customer_data)
         if updated_customer:
             return updated_customer
         else:
@@ -47,12 +47,12 @@ async def update_customer(customer_id: str, customer_data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def delete_customer(customer_id: str):
+async def delete_customer(db, customer_id):
     """
     Delete a customer by ID
     """
     try:
-        deletion_success = await delete_customer_from_db(customer_id)
+        deletion_success = await delete_customer_from_db(db, customer_id)
         if deletion_success:
             return {"message": "Customer deleted successfully"}
         else:
@@ -61,12 +61,12 @@ async def delete_customer(customer_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def list_customers():
+async def list_customers(db):
     """
     List all customers
     """
     try:
-        customers = await list_all_customers_from_db()
+        customers = await list_all_customers_from_db(db=db)
         return customers
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,5 +1,6 @@
-from fastapi import APIRouter
-
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from ...db.connection import get_db
 
 from fastapi import HTTPException
 from app.api.controllers.customers import (
@@ -9,29 +10,32 @@ from app.api.controllers.customers import (
     delete_customer as delete_customer_controller,
     list_customers as list_customers_controller,
 )
+from app.api.utils.customer_utils import(
+    list_all_customers_from_db
+)
 
 router = APIRouter()
 
 
 @router.post("/customers/", status_code=201)
-async def create_customer(customer_data: dict):
+async def create_customer(customer_data: dict, db: AsyncSession = Depends(get_db)):
     """
     Create a new customer
     """
     try:
-        new_customer = await create_customer_controller(customer_data)
+        new_customer = await create_customer_controller(db, customer_data)
         return new_customer
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get("/customers/{customer_id}", response_model=dict)
-async def read_customer(customer_id: str):
+@router.get("/customers/{customer_id}")
+async def read_customer(customer_id: str, db: AsyncSession = Depends(get_db)):
     """
     Get a customer by ID
     """
     try:
-        customer = await read_customer_controller(customer_id)
+        customer = await read_customer_controller(db, int(customer_id))
         if customer:
             return customer
         else:
@@ -40,13 +44,13 @@ async def read_customer(customer_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/customers/{customer_id}", response_model=dict)
-async def update_customer(customer_id: str, customer_data: dict):
+@router.put("/customers/{customer_id}")
+async def update_customer(customer_id: str, customer_data: dict, db: AsyncSession = Depends(get_db)):
     """
     Update a customer by ID
     """
     try:
-        updated_customer = await update_customer_controller(customer_id, customer_data)
+        updated_customer = await update_customer_controller(db, int(customer_id), customer_data)
         if updated_customer:
             return updated_customer
         else:
@@ -56,12 +60,12 @@ async def update_customer(customer_id: str, customer_data: dict):
 
 
 @router.delete("/customers/{customer_id}", status_code=204)
-async def delete_customer(customer_id: str):
+async def delete_customer(customer_id: str, db: AsyncSession = Depends(get_db)):
     """
     Delete a customer by ID
     """
     try:
-        deletion_success = await delete_customer_controller(customer_id)
+        deletion_success = await delete_customer_controller(db, int(customer_id))
         if deletion_success:
             return {"message": "Customer deleted successfully"}
         else:
@@ -70,13 +74,11 @@ async def delete_customer(customer_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/customers/", response_model=list)
-async def list_customers():
-    """
-    List all customers
-    """
+@router.get("/customers/")
+async def list_customers(db: AsyncSession = Depends(get_db)):
     try:
-        customers = await list_customers_controller()
+        # Example function call that uses the session
+        customers = await list_all_customers_from_db(db)
         return customers
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
