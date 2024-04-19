@@ -2,4 +2,4 @@ uvicorn
 fastapi
 sqlalchemy
 asyncpg
-
+stripe
