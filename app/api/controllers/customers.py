@@ -89,9 +89,7 @@ async def stripe_webhook(db, request: Request):
     sig_header = request.headers.get('stripe-signature')
     if not sig_header:
         raise HTTPException(status_code=400, detail="Missing Stripe signature header")
-    
-    print("payload: ", payload)
-    print("stripe-signature: ", sig_header)
+
 
     try:
         event = stripe.Event.construct_from(
@@ -99,10 +97,8 @@ async def stripe_webhook(db, request: Request):
     )
 
     except ValueError as e:
-        print("1")
         raise HTTPException(status_code=400, detail=str(e))
     except stripe.error.SignatureVerificationError as e:
-        print("2")
         raise HTTPException(status_code=400, detail=str(e))
 
     # Handling events
@@ -113,17 +109,34 @@ async def stripe_webhook(db, request: Request):
             'name': customer_info['name'],
             'email': customer_info['email']
         }
-        await create_customer(db, new_customer)
+        await handle_customer_creation(db, new_customer)
     elif event['type'] == 'customer.deleted':
-        await delete_customer(db, event['data']['object']["id"])
+        await handle_customer_deletion(db, event['data']['object']["id"])
     else:
         return Response(content="Unhandled event type", status_code=400)
 
     return {"status": "success"}
 
-# Define the event handlers
-def handle_customer_created(customer):
-    print("Customer created:", customer)
+# Event handlers
+async def handle_customer_creation(db, customer_data):
+    """
+    Create a new customer
+    """
+    try:
+        customer = await create_customer_in_db(db, customer_data)
+        return customer
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-def handle_customer_deleted(customer):
-    print("Customer deleted:", customer)
+async def handle_customer_deletion(db, customer_id):
+    """
+    Delete a customer by ID
+    """
+    try:
+        deletion_success = await delete_customer_from_db(db, customer_id)
+        if deletion_success:
+            return {"message": "Customer deleted successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="Customer not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
