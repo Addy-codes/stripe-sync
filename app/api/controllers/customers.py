@@ -10,6 +10,11 @@ from ...core.config import settings
 import stripe
 import json
 from ...db.connection import get_db
+from ...kafka.kafka import(
+    create_customer_event,
+    EVENT_CUSTOMER_CREATED,
+    EVENT_CUSTOMER_DELETED
+)
 
 
 stripe.api_key = settings.STRIPE_API_KEY
@@ -20,8 +25,9 @@ async def create_customer(db, customer_data: dict):
     Create a new customer
     """
     try:
-        new_customer = await create_customer_in_db(db, customer_data)
-        return new_customer
+        customer = await create_customer_in_db(db, customer_data)
+        create_customer_event(EVENT_CUSTOMER_CREATED, customer.id, customer.name, customer.email)
+        return customer
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -61,6 +67,7 @@ async def delete_customer(db, customer_id):
     try:
         deletion_success = await delete_customer_from_db(db, customer_id)
         if deletion_success:
+            create_customer_event(EVENT_CUSTOMER_DELETED, customer_id, "", "")
             return {"message": "Customer deleted successfully"}
         else:
             raise HTTPException(status_code=404, detail="Customer not found")
@@ -100,10 +107,15 @@ async def stripe_webhook(db, request: Request):
 
     # Handling events
     if event['type'] == 'customer.created':
-        new_customer = {}
-        create_customer(db, new_customer)
+        customer_info = event['data']['object']
+        new_customer = {
+            'id': customer_info['id'],
+            'name': customer_info['name'],
+            'email': customer_info['email']
+        }
+        await create_customer(db, new_customer)
     elif event['type'] == 'customer.deleted':
-        handle_customer_deleted(event['data']['object'])
+        await delete_customer(db, event['data']['object']["id"])
     else:
         return Response(content="Unhandled event type", status_code=400)
 

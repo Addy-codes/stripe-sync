@@ -68,7 +68,7 @@ async def delete_customer(customer_id: str, db: AsyncSession = Depends(get_db)):
     Delete a customer by ID
     """
     try:
-        deletion_success = await delete_customer_controller(db, int(customer_id))
+        deletion_success = await delete_customer_controller(db, customer_id)
         if deletion_success:
             return {"message": "Customer deleted successfully"}
         else:
