@@ -5,6 +5,8 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
     DB_PASSWORD: str
+    STRIPE_API_KEY: str
+    STRIPE_SECRET_KEY: str
 
     class Config:
         env_file = ".env"

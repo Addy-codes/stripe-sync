@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Response, Request
 from app.api.utils.customer_utils import (
     create_customer_in_db,
     get_customer_from_db,
@@ -6,7 +6,14 @@ from app.api.utils.customer_utils import (
     delete_customer_from_db,
     list_all_customers_from_db,
 )
+from ...core.config import settings
+import stripe
+import json
+from ...db.connection import get_db
 
+
+stripe.api_key = settings.STRIPE_API_KEY
+stripe_endpoint_secret = settings.STRIPE_SECRET_KEY
 
 async def create_customer(db, customer_data: dict):
     """
@@ -60,7 +67,6 @@ async def delete_customer(db, customer_id):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 async def list_customers(db):
     """
     List all customers
@@ -70,3 +76,42 @@ async def list_customers(db):
         return customers
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+async def stripe_webhook(db, request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get('stripe-signature')
+    if not sig_header:
+        raise HTTPException(status_code=400, detail="Missing Stripe signature header")
+    
+    print("payload: ", payload)
+    print("stripe-signature: ", sig_header)
+
+    try:
+        event = stripe.Event.construct_from(
+      json.loads(payload), stripe.api_key
+    )
+
+    except ValueError as e:
+        print("1")
+        raise HTTPException(status_code=400, detail=str(e))
+    except stripe.error.SignatureVerificationError as e:
+        print("2")
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # Handling events
+    if event['type'] == 'customer.created':
+        new_customer = {}
+        create_customer(db, new_customer)
+    elif event['type'] == 'customer.deleted':
+        handle_customer_deleted(event['data']['object'])
+    else:
+        return Response(content="Unhandled event type", status_code=400)
+
+    return {"status": "success"}
+
+# Define the event handlers
+def handle_customer_created(customer):
+    print("Customer created:", customer)
+
+def handle_customer_deleted(customer):
+    print("Customer deleted:", customer)

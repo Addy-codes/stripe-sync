@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from ...db.connection import get_db
-
 from fastapi import HTTPException
 from app.api.controllers.customers import (
     create_customer as create_customer_controller,
@@ -9,13 +8,17 @@ from app.api.controllers.customers import (
     update_customer as update_customer_controller,
     delete_customer as delete_customer_controller,
     list_customers as list_customers_controller,
+    stripe_webhook as stripe_webhook_controller
 )
-from app.api.utils.customer_utils import(
-    list_all_customers_from_db
-)
+from ...core.config import settings
+import stripe
+import json
 
 router = APIRouter()
 
+# Set your Stripe secret key and endpoint secret
+stripe.api_key = settings.STRIPE_API_KEY
+stripe_endpoint_secret = settings.STRIPE_SECRET_KEY
 
 @router.post("/customers/", status_code=201)
 async def create_customer(customer_data: dict, db: AsyncSession = Depends(get_db)):
@@ -78,7 +81,17 @@ async def delete_customer(customer_id: str, db: AsyncSession = Depends(get_db)):
 async def list_customers(db: AsyncSession = Depends(get_db)):
     try:
         # Example function call that uses the session
-        customers = await list_all_customers_from_db(db)
+        customers = await list_customers_controller(db)
         return customers
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/stripe-webhook")
+async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
+    try:
+        event = await stripe_webhook_controller(db=db, request=request)
+        return event
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
