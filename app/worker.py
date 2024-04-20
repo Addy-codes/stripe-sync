@@ -36,7 +36,7 @@ def process_message(msg):
 consumer.subscribe(['customer_events'])
 
 while True:
-    msg = consumer.poll(1.0)
+    msg = consumer.poll(5.0)
     if msg is None:
         continue
 
