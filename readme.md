@@ -32,7 +32,7 @@ Stripe Dashboard:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://yourrepositorylink.git
+git clone https://github.com/Addy-codes/stripe-sync
 cd stripe-sync
 ```
 
@@ -90,6 +90,7 @@ Go to your Stripe Dashboard and set the webhook to point to the URL provided by 
 ### 10. Run Workers
 Start the workers that will handle Kafka messages:
 ```bash
+cd app
 python workers.py
 ```
 
