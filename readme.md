@@ -16,6 +16,18 @@ This project integrates Stripe's customer catalog into a backend application bui
 - Kafka
 - Ngrok account (for local development)
 
+## Screenshots:
+
+Openapi Docs:
+![image](https://github.com/Addy-codes/stripe-sync/assets/72205091/3623b96c-73f6-4c92-bb37-c6c5cc4b7c4c)
+
+Postgres:
+![image](https://github.com/Addy-codes/stripe-sync/assets/72205091/734bc8bc-373a-4b62-a104-221ea1bb8ea2)
+
+Stripe Dashboard:
+![image](https://github.com/Addy-codes/stripe-sync/assets/72205091/20b090eb-dac8-4714-afec-b3ce33026d64)
+
+
 ## Project Setup
 
 ### 1. Clone the Repository
