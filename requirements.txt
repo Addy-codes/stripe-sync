@@ -3,3 +3,5 @@ fastapi
 sqlalchemy
 asyncpg
 stripe
+confluent-kafka
+pydantic-settings
