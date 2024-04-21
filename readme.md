@@ -85,7 +85,7 @@ uvicorn main:app --reload
 ```
 
 ### 9. Setup Stripe Webhook
-Go to your Stripe Dashboard and set the webhook to point to the URL provided by Ngrok followed by `/stripe-webhook`.
+Go to your Stripe Dashboard and set the webhook to point to the URL provided by Ngrok followed by `/api/stripe-webhook`.
 
 ### 10. Run Workers
 Start the workers that will handle Kafka messages:
@@ -94,7 +94,8 @@ python workers.py
 ```
 
 ## Usage
-The API can be accessed via `http://localhost:8000` or through the Ngrok URL when running locally. Use endpoints such as `/customers` for managing customer data and `/stripe-webhook` to handle incoming Stripe events.
+The API can be accessed via `http://localhost:8000` or through the Ngrok URL when running locally. Use endpoints such as `/api/customers` for managing customer data and `/api/stripe-webhook` to handle incoming Stripe events.
+One can also view and interact with the API using 'http://localhost:8000/docs'
 
 ---
 
