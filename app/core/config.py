@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
     STRIPE_API_KEY: str
+    STRIPE_WEBHOOK_KEY: str
     STRIPE_SECRET_KEY: str
 
     class Config:

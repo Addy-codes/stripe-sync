@@ -58,7 +58,8 @@ DB_NAME=zenskar
 DB_USER=your-username
 DB_PASSWORD=your-password
 STRIPE_API_KEY=pk_test_your-api-key
-STRIPE_SECRET_KEY=whsec_your-secret-key
+STRIPE_WEBHOOK_KEY=whsec_your-webhook-key
+STRIPE_SECRET_KEY=sk_test_your-secret-key
 ```
 ### 5. Database Setup
 Navigate to the root directory of your project where the `alembic.ini` file is located and run the following command to apply migrations:

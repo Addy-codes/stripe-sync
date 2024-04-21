@@ -18,7 +18,7 @@ router = APIRouter()
 
 # Set your Stripe secret key and endpoint secret
 stripe.api_key = settings.STRIPE_API_KEY
-stripe_endpoint_secret = settings.STRIPE_SECRET_KEY
+stripe_endpoint_secret = settings.STRIPE_WEBHOOK_KEY
 
 @router.post("/stripe-webhook")
 async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):

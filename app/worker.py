@@ -1,11 +1,18 @@
 from confluent_kafka import Consumer, KafkaError
 import stripe
 import json
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 EVENT_CUSTOMER_CREATED = 'customer_created'
 EVENT_CUSTOMER_DELETED = 'customer_deleted'
 
-stripe.api_key = "sk_test_51P73JmSFWwrSz7SwOEfNvhPIFJ4sznH5eGR6vjq7cm3hJ67b4IR8lFrtREJvsq3NTkVWEECMyB2wT8H0YJtRNlLm00WIopzyYU"
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+
+print(stripe.api_key)
 
 consumer = Consumer({
     'bootstrap.servers': 'localhost:9092',

@@ -18,7 +18,7 @@ from ...kafka.kafka import(
 
 
 stripe.api_key = settings.STRIPE_API_KEY
-stripe_endpoint_secret = settings.STRIPE_SECRET_KEY
+stripe_endpoint_secret = settings.STRIPE_WEBHOOK_KEY
 
 async def create_customer(db, customer_data: dict):
     """
