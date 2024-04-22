@@ -12,8 +12,6 @@ EVENT_CUSTOMER_DELETED = 'customer_deleted'
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 
-print(stripe.api_key)
-
 consumer = Consumer({
     'bootstrap.servers': 'localhost:9092',
     'group.id': 'my-group',

@@ -20,7 +20,7 @@ from ...kafka.kafka import(
 stripe.api_key = settings.STRIPE_API_KEY
 stripe_endpoint_secret = settings.STRIPE_WEBHOOK_KEY
 
-async def create_customer(db, customer_data: dict):
+async def create_customer(db, customer: dict):
     """
     Create a new customer.
 
@@ -34,6 +34,12 @@ async def create_customer(db, customer_data: dict):
     Raises:
     - HTTPException: An error occurred that prevents the customer from being created.
     """
+
+    customer_data = {
+        "id": customer.id,
+        "name": customer.name,
+        "email": customer.email
+    }
 
     # The service data is hardcoded for stripe for now, open to changes for future integrations
     service_data = {

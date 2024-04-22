@@ -13,6 +13,7 @@ from app.api.controllers.customers import (
 from ...core.config import settings
 import stripe
 import json
+from ...models.customers import CustomerCreate
 
 router = APIRouter()
 
@@ -42,7 +43,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/customers/", status_code=201)
-async def create_customer(customer_data: dict, db: AsyncSession = Depends(get_db)):
+async def create_customer(customer_data: CustomerCreate, db: AsyncSession = Depends(get_db)):
     """
     Create a new customer in the database from provided data.
 
