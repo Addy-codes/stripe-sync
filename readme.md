@@ -81,7 +81,7 @@ Copy the HTTPS URL provided by Ngrok to your Stripe webhook settings.
 ### 8. Running the Application
 Run the FastAPI application using Uvicorn:
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 ### 9. Setup Stripe Webhook
